@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>نتائج الطالب - السادس</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            -webkit-text-size-adjust: none;
+            -moz-text-size-adjust: none;
+            text-size-adjust: none;
+        }
+        
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            position: fixed;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #333;
+            touch-action: manipulation;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 500px;
+            padding: 20px;
+            position: relative;
+            z-index: 10;
+        }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+            padding: 30px;
+            text-align: center;
+            transition: transform 0.5s, opacity 0.5s;
+            backdrop-filter: blur(10px);
+        }
+        
+        .welcome-screen {
+            animation: fadeIn 1s ease-out;
+        }
+        
+        .form-screen, .result-screen {
+            display: none;
+            opacity: 0;
+        }
+        
+        h1 {
+            color: #1a2a6c;
+            margin-bottom: 20px;
+            font-size: 2.2rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .animation-text {
+            font-size: 2.5rem;
+            color: #0d1b3a;
+            text-align: center;
+            margin-bottom: 30px;
+            animation: pulse 2s infinite;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.7);
+            font-weight: bold;
+        }
+        
+        .btn {
+            background: linear-gradient(45deg, #1a2a6c, #b21f1f);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            margin-top: 20px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .btn:active {
+            transform: translateY(1px);
+        }
+        
+        input {
+            width: 100%;
+            padding: 15px;
+            margin: 15px 0;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            text-align: center;
+            transition: border 0.3s;
+        }
+        
+        input:focus {
+            border-color: #1a2a6c;
+            outline: none;
+        }
+        
+        .result-header {
+            background: #1a2a6c;
+            color: white;
+            padding: 15px;
+            border-radius: 10px 10px 0 0;
+            margin-bottom: 20px;
+        }
+        
+        .student-name {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .result-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        .result-table th, .result-table td {
+            padding: 15px;
+            text-align: center;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .result-table th {
+            background-color: #f5f5f5;
+            color: #1a2a6c;
+            font-weight: bold;
+        }
+        
+        .result-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .subject-name {
+            text-align: right;
+            font-weight: bold;
+        }
+        
+        .grade {
+            font-weight: bold;
+            color: #1a2a6c;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .fade-out {
+            animation: fadeOut 0.5s forwards;
+        }
+        
+        @keyframes fadeOut {
+            from { opacity: 1; transform: translateY(0); }
+            to { opacity: 0; transform: translateY(-20px); }
+        }
+        
+        .watermark {
+            position: absolute;
+            bottom: 20px;
+            width: 100%;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+        }
+        
+        .copyright {
+            position: absolute;
+            top: 20px;
+            width: 100%;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1rem;
+            font-weight: bold;
+            z-index: 100;
+        }
+        
+        /* تأثير الألعاب النارية */
+        .firework {
+            position: absolute;
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        @keyframes explode {
+            0% {
+                transform: translate(0, 0);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(var(--tx), var(--ty));
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="copyright">حقوق الطبع محفوظة لقناة ابن الكوفة</div>
+    
+    <div class="container">
+        <!-- شاشة الترحيب -->
+        <div class="card welcome-screen" id="welcomeScreen">
+            <h1 class="animation-text">تريد تنجح من السادس؟</h1>
+            <button class="btn" id="yesBtn">نعم</button>
+        </div>
+        
+        <!-- شاشة إدخال الاسم -->
+        <div class="card form-screen" id="formScreen">
+            <h1>أدخل اسمك الرباعي</h1>
+            <input type="text" id="studentName" placeholder="الاسم الرباعي">
+            <button class="btn" id="nextBtn">التالي</button>
+        </div>
+        
+        <!-- شاشة النتائج -->
+        <div class="card result-screen" id="resultScreen">
+            <div class="result-header">
+                <h1>نتيجة الطالب</h1>
+                <div class="student-name" id="studentNameDisplay">اسم الطالب</div>
+            </div>
+            <table class="result-table">
+                <tr>
+                    <th class="subject-name">المادة</th>
+                    <th>الدرجة</th>
+                </tr>
+                <tr>
+                    <td class="subject-name">الاسلامية</td>
+                    <td class="grade">100</td>
+                </tr>
+                <tr>
+                    <td class="subject-name">العربية</td>
+                    <td class="grade">100</td>
+                </tr>
+                <tr>
+                    <td class="subject-name">الانكليزية</td>
+                    <td class="grade">100</td>
+                </tr>
+                <tr>
+                    <td class="subject-name">الاحياء</td>
+                    <td class="grade">100</td>
+                </tr>
+                <tr>
+                    <td class="subject-name">الرياضيات</td>
+                    <td class="grade">100</td>
+                </tr>
+                <tr>
+                    <td class="subject-name">الكيمياء</td>
+                    <td class="grade">100</td>
+                </tr>
+                <tr>
+                    <td class="subject-name">الفيزياء</td>
+                    <td class="grade">100</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    
+    <div class="watermark">من الوزارة</div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const welcomeScreen = document.getElementById('welcomeScreen');
+            const formScreen = document.getElementById('formScreen');
+            const resultScreen = document.getElementById('resultScreen');
+            const yesBtn = document.getElementById('yesBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const studentNameInput = document.getElementById('studentName');
+            const studentNameDisplay = document.getElementById('studentNameDisplay');
+            
+            // منع التكبير والتصغير
+            document.addEventListener('gesturestart', function(e) {
+                e.preventDefault();
+            });
+            
+            document.addEventListener('gesturechange', function(e) {
+                e.preventDefault();
+            });
+            
+            document.addEventListener('gestureend', function(e) {
+                e.preventDefault();
+            });
+            
+            // الانتقال من شاشة الترحيب إلى شاشة الاسم
+            yesBtn.addEventListener('click', function() {
+                welcomeScreen.classList.add('fade-out');
+                setTimeout(function() {
+                    welcomeScreen.style.display = 'none';
+                    formScreen.style.display = 'block';
+                    setTimeout(function() {
+                        formScreen.style.opacity = '1';
+                    }, 50);
+                }, 500);
+            });
+            
+            // الانتقال من شاشة الاسم إلى شاشة النتائج مع تأثير الألعاب النارية
+            nextBtn.addEventListener('click', function() {
+                const name = studentNameInput.value.trim();
+                if (name === '') {
+                    alert('يرجى إدخال الاسم الرباعي');
+                    return;
+                }
+                
+                formScreen.classList.add('fade-out');
+                
+                // إطلاق الألعاب النارية مرة واحدة
+                createFireworks(20);
+                
+                // ظهور النتيجة مباشرة مع الألعاب النارية
+                setTimeout(function() {
+                    formScreen.style.display = 'none';
+                    studentNameDisplay.textContent = name;
+                    resultScreen.style.display = 'block';
+                    setTimeout(function() {
+                        resultScreen.style.opacity = '1';
+                    }, 50);
+                }, 100);
+            });
+            
+            // منع نسخ النص
+            document.addEventListener('copy', function(e) {
+                e.preventDefault();
+            });
+            
+            // منع تغيير حجم النص
+            document.addEventListener('contextmenu', function(e) {
+                e.preventDefault();
+            });
+            
+            // دالة إنشاء الألعاب النارية
+            function createFireworks(count) {
+                const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff', '#ffffff'];
+                
+                for (let i = 0; i < count; i++) {
+                    setTimeout(() => {
+                        const firework = document.createElement('div');
+                        firework.className = 'firework';
+                        
+                        // اختيار لون عشوائي
+                        const color = colors[Math.floor(Math.random() * colors.length)];
+                        firework.style.backgroundColor = color;
+                        
+                        // وضع عشوائي على الشاشة
+                        const startX = Math.random() * window.innerWidth;
+                        const startY = Math.random() * window.innerHeight;
+                        firework.style.left = startX + 'px';
+                        firework.style.top = startY + 'px';
+                        
+                        // إضافة إلى body
+                        document.body.appendChild(firework);
+                        
+                        // إنشاء جزيئات الانفجار
+                        createExplosion(startX, startY, color);
+                        
+                        // إزالة الألعاب النارية بعد الانتهاء
+                        setTimeout(() => {
+                            firework.remove();
+                        }, 800);
+                    }, i * 100);
+                }
+            }
+            
+            // دالة إنشاء انفجار الألعاب النارية
+            function createExplosion(x, y, color) {
+                const particleCount = 30;
+                
+                for (let i = 0; i < particleCount; i++) {
+                    const particle = document.createElement('div');
+                    particle.className = 'firework';
+                    particle.style.backgroundColor = color;
+                    
+                    // وضع البداية
+                    particle.style.left = x + 'px';
+                    particle.style.top = y + 'px';
+                    
+                    // اتجاهات عشوائية للجزيئات
+                    const angle = Math.random() * Math.PI * 2;
+                    const speed = 2 + Math.random() * 3;
+                    const tx = Math.cos(angle) * speed * 50;
+                    const ty = Math.sin(angle) * speed * 50;
+                    
+                    // إضافة متغيرات CSS للتحريك
+                    particle.style.setProperty('--tx', tx + 'px');
+                    particle.style.setProperty('--ty', ty + 'px');
+                    
+                    // إضافة إلى body
+                    document.body.appendChild(particle);
+                    
+                    // تطبيق التحريك
+                    particle.style.animation = `explode 0.8s forwards`;
+                    
+                    // إزالة الجزيئات بعد الانتهاء
+                    setTimeout(() => {
+                        particle.remove();
+                    }, 800);
+                }
+            }
+        });
+    </script>
+</body>
+</html>
